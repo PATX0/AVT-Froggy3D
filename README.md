@@ -30,7 +30,8 @@ DELIVERY ON 23/10
 - [ ] CARS, TURTLES: uniform & rectilinear	
 - [ ] TRUNKS: uniform, rectilinear with rotation 
 
-## Light and Materials
+## Light,  Materials and Textures
+
 ### Materials
 - [ ] Appropriate materials for the different objects
 
@@ -43,6 +44,29 @@ DELIVERY ON 23/10
 - [ ] Spotlight on top of FROG head (indicates where he is facing)
 
 'H' -> ON/OFF
+
+### Texture 
+
+- [ ] 2 Textures for Road and 1 for River (should react to light, TGA Files)
+
+## Gameplay
+
+- [ ] Collision Detection AABB
+
+Frog & limits : stops even if pressing
+
+Frog & River : dies if not a Wood Trunk or Turtle 
+
+Frog & Cars : dies 
+
+- [ ] 'S' -> Pause Game showing a message
+- [ ] HUD: 5 Lives Mechanism, Point Count
+- [ ] EndGame
+ 
+- [ ] 'R' -> When out of lives, restarts game
+
+ 
+
 
 
 -----------------------------------------------------------------------------------------------------
