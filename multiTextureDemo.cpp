@@ -162,7 +162,7 @@ void renderScene(void) {
 		glUniform1i(tex_loc1, 1); 
 		glUniform1i(tex_loc2, 2); 
 		
-	objId=0;
+	objId=1;
 	
 	for (int i = 0 ; i < 3; ++i) {
 		for (int j = 0; j < 4; ++j) {
@@ -177,8 +177,7 @@ void renderScene(void) {
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, i*3.7f, 0.0f, j*3.7f);
-
+			translate(MODEL, i * 4.7f, 0.0f, j * 3.7f);
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -367,9 +366,9 @@ void init()
 	//Texture Object definition
 	
 	glGenTextures(3, TextureArray);
-	TGA_Texture(TextureArray, "stone.tga", 0);
-	TGA_Texture(TextureArray, "checker.tga", 1);
-	TGA_Texture(TextureArray, "lightwood.tga", 2);
+	TGA_Texture(TextureArray, (char*)"stone.tga", 0);
+	TGA_Texture(TextureArray, (char*)"checker.tga", 1);
+	TGA_Texture(TextureArray, (char*)"lightwood.tga", 2);
 
 	float amb[]= {0.2f, 0.15f, 0.1f, 1.0f};
 	float diff[] = {0.8f, 0.6f, 0.4f, 1.0f};
@@ -384,6 +383,8 @@ void init()
 	float shininess= 100.0f;
 	int texcount = 0;
 
+	lookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
+
 	// create geometry and VAO of the pawn
 	objId=0;
 	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
@@ -393,6 +394,12 @@ void init()
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createPawn();
+	loadIdentity(MODEL);
+	loadIdentity(VIEW);
+	pushMatrix(MODEL);
+	translate(MODEL, 3, 3, 3);
+	popMatrix(MODEL);
+
 
 	// create geometry and VAO of the sphere
 	objId=1;
