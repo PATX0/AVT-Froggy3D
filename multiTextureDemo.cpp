@@ -62,7 +62,7 @@ GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2;
 GLint texMode_uniformId;
 
-GLuint TextureArray[3];
+GLuint TextureArray[4];
 
 	
 // Camera Position
@@ -157,6 +157,9 @@ void renderScene(void) {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[2]);
 
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[3]);
+
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
 		glUniform1i(tex_loc1, 1); 
@@ -177,7 +180,15 @@ void renderScene(void) {
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, i * 4.7f, 0.0f, j * 3.7f);
+			if (objId == 0) {
+				translate(MODEL, 2.5f, 0.0f, -25.0f);
+				scale(MODEL, 10.0f, 0.2f, 50.0f);
+			}
+			if (objId == 3) {
+				translate(MODEL, -2.5f, 0.0f, -25.0f);
+				scale(MODEL, 5.0f, 0.2f, 50.0f);
+				
+			}
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -365,10 +376,11 @@ void init()
 
 	//Texture Object definition
 	
-	glGenTextures(3, TextureArray);
+	glGenTextures(4, TextureArray);
 	TGA_Texture(TextureArray, (char*)"stone.tga", 0);
-	TGA_Texture(TextureArray, (char*)"checker.tga", 1);
+	TGA_Texture(TextureArray, (char*)"street2LAnes.tga", 1);
 	TGA_Texture(TextureArray, (char*)"lightwood.tga", 2);
+	TGA_Texture(TextureArray, (char*)"forest_pathway.tga", 3);
 
 	float amb[]= {0.2f, 0.15f, 0.1f, 1.0f};
 	float diff[] = {0.8f, 0.6f, 0.4f, 1.0f};
@@ -393,12 +405,7 @@ void init()
 	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
-	createPawn();
-	loadIdentity(MODEL);
-	loadIdentity(VIEW);
-	pushMatrix(MODEL);
-	translate(MODEL, 3, 3, 3);
-	popMatrix(MODEL);
+	createCube();
 
 
 	// create geometry and VAO of the sphere
@@ -419,7 +426,7 @@ void init()
 	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
-	createCylinder(1.5f,0.5f,20);
+	createCylinder(5.0f,0.5f,20);
 
 	// create geometry and VAO of the cone
 	objId=3;
@@ -429,7 +436,7 @@ void init()
 	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
-	createCone(2.5f,1.2f, 20);
+	createCube();
 
 	// create geometry and VAO of the torus
 	objId=4;
