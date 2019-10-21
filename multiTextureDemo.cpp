@@ -10,7 +10,7 @@
 // You may use it, or parts of it, wherever you want.
 //
 //
-//Author: Jo„o Madeiras Pereira
+//Author: Jo√£o Madeiras Pereira
 
 #include <math.h>
 #include <iostream>
@@ -80,6 +80,9 @@ long myTime,timebase = 0,frame = 0;
 char s[32];
 float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 
+float positionMov[3] = { 0.0f, 0.0f, 0.0f };
+float rotationMov[3] = { 0.0f, 0.0f, 0.0f };
+float scaleMov[3] = { 1.0f, 1.0f, 1.0f };
 
 void timer(int value)
 {
@@ -88,14 +91,14 @@ void timer(int value)
 	std::string s = oss.str();
 	glutSetWindow(WindowHandle);
 	glutSetWindowTitle(s.c_str());
-    FrameCount = 0;
-    glutTimerFunc(1000, timer, 0);
+	FrameCount = 0;
+	glutTimerFunc(1000, timer, 0);
 }
 
 void refresh(int value)
 {
 	glutPostRedisplay();
-	glutTimerFunc(1000/FPS, refresh, 0);
+	glutTimerFunc(1000 / FPS, refresh, 0);
 }
 
 // ------------------------------------------------------------
@@ -107,7 +110,7 @@ void changeSize(int w, int h) {
 
 	float ratio;
 	// Prevent a divide by zero, when window is too short
-	if(h == 0)
+	if (h == 0)
 		h = 1;
 	// set the viewport to be the entire window
 	glViewport(0, 0, w, h);
@@ -133,99 +136,101 @@ void renderScene(void) {
 	loadIdentity(VIEW);
 	loadIdentity(MODEL);
 	// set the camera using a function similar to gluLookAt
-	lookAt(camX, camY, camZ, 0,0,0, 0,1,0);
+	lookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
 
 	//send the light position in eye coordinates
 
-		glUniform4fv(lPos_uniformId, 1, lightPos); //efeito capacete do mineiro, ou seja lighPos foi definido em eye coord 
+	glUniform4fv(lPos_uniformId, 1, lightPos); //efeito capacete do mineiro, ou seja lighPos foi definido em eye coord 
 /*
 		float res[4];
 		multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
 		glUniform4fv(lPos_uniformId, 1, res);
 */
-		//Associar os Texture Units aos Objects Texture
-		//stone.tga loaded in TU0; checker.tga loaded in TU1;  lightwood.tga loaded in TU2
+//Associar os Texture Units aos Objects Texture
+//stone.tga loaded in TU0; checker.tga loaded in TU1;  lightwood.tga loaded in TU2
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureArray[0]);  
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, TextureArray[0]);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, TextureArray[1]);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, TextureArray[1]);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, TextureArray[2]);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, TextureArray[2]);
 
-		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
-		glUniform1i(tex_loc, 0);  
-		glUniform1i(tex_loc1, 1); 
-		glUniform1i(tex_loc2, 2); 
-		
-	objId=0;
-	
-	for (int i = 0 ; i < 7; ++i) {
+	//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
+	glUniform1i(tex_loc, 0);
+	glUniform1i(tex_loc1, 1);
+	glUniform1i(tex_loc2, 2);
 
-			// send the material
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
-			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
-			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
-			glUniform4fv(loc, 1, mesh[objId].mat.specular);
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
-			glUniform1f(loc,mesh[objId].mat.shininess);
-			pushMatrix(MODEL);
-			if (i == 0) {
-				translate(MODEL, 2.5f, 0.0f, -25.0f);
-				scale(MODEL, 10.0f, 0.1f, 50.0f);
-			}
-			else if (i == 1) {
-				translate(MODEL, -2.5f, 0.0f, -25.0f);
-				scale(MODEL, 5.0f, 0.1f, 50.0f);
-			}
-			else if (i == 2) {
-				translate(MODEL, 12.5, 0.0f, -25.0f);
-				scale(MODEL, 15.0f, 0.1f, 50.0f);
-			}
-			else if (i == 3) {
-				translate(MODEL, 27.5, 0.0f, -25.0f);
-				scale(MODEL, 5.0f, 0.1f, 50.0f);
-			}
-			else if (i == 4) {
-					scale(MODEL, 1.5f, 1.1f, 1.0f);
-			}
+	objId = 0;
 
-			else if (i == 5) {
-				translate(MODEL, 0.8f, 0.7f, 0.0f);
-			}
-			
-			else if (i == 6) {
-				translate(MODEL, 5.0f, 0.1f, -4.0f);
-				scale(MODEL, 3.0f, 2.0f, 5.0f);
-			}
-			// send matrices to OGL
-			computeDerivedMatrix(PROJ_VIEW_MODEL);
-			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
-			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
-			computeNormalMatrix3x3();
-			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+	for (int i = 0; i < 7; ++i) {
 
-			// Render mesh
+		// send the material
+		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+		glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+		glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+		glUniform4fv(loc, 1, mesh[objId].mat.specular);
+		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+		glUniform1f(loc, mesh[objId].mat.shininess);
+		pushMatrix(MODEL);
+		if (i == 0) {
+			translate(MODEL, 2.5f, 0.0f, -25.0f);
+			scale(MODEL, 10.0f, 0.1f, 50.0f);
+		}
+		else if (i == 1) {
+			translate(MODEL, -2.5f, 0.0f, -25.0f);
+			scale(MODEL, 5.0f, 0.1f, 50.0f);
+		}
+		else if (i == 2) {
+			translate(MODEL, 12.5, 0.0f, -25.0f);
+			scale(MODEL, 15.0f, 0.1f, 50.0f);
+		}
+		else if (i == 3) {
+			translate(MODEL, 27.5, 0.0f, -25.0f);
+			scale(MODEL, 5.0f, 0.1f, 50.0f);
+		}
+		else if (i == 4) {
+			scale(MODEL, 1.5f, 1.1f, 1.0f);
+			translate(MODEL, positionMov[0], positionMov[1], positionMov[2]);
+		}
 
-			if (objId==0) glUniform1i(texMode_uniformId, 2); // modulate Phong color with texel color
-			else if( objId >= 1) glUniform1i(texMode_uniformId, 0); // sÛ componente especular
-			//else glUniform1i(texMode_uniformId, 2); // multitexturing
+		else if (i == 5) {
+			translate(MODEL, 0.8f, 0.7f, 0.0f);
+			translate(MODEL, positionMov[0]*1.5, positionMov[1], positionMov[2]);
+		}
 
-			glBindVertexArray(mesh[objId].vao);
-			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
+		else if (i == 6) {
+			translate(MODEL, 5.0f, 0.1f, -4.0f);
+			scale(MODEL, 3.0f, 2.0f, 5.0f);
+		}
+		// send matrices to OGL
+		computeDerivedMatrix(PROJ_VIEW_MODEL);
+		glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+		glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+		computeNormalMatrix3x3();
+		glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
-			popMatrix(MODEL);
-			objId = (objId+1)%7; 
+		// Render mesh
+
+		if (objId == 0) glUniform1i(texMode_uniformId, 2); // modulate Phong color with texel color
+		else if (objId >= 1) glUniform1i(texMode_uniformId, 0); // s√≥ componente especular
+		//else glUniform1i(texMode_uniformId, 2); // multitexturing
+
+		glBindVertexArray(mesh[objId].vao);
+		glDrawElements(mesh[objId].type, mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+
+		popMatrix(MODEL);
+		objId = (objId + 1) % 7;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, 0);		
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glutSwapBuffers();
 }
 
@@ -236,17 +241,23 @@ void renderScene(void) {
 
 void processKeys(unsigned char key, int xx, int yy)
 {
-	switch(key) {
+	switch (key) {
 
-		case 27:
-			glutLeaveMainLoop();
-			break;
+	case 27:
+		glutLeaveMainLoop();
+		break;
 
-		case 'c': 
-			printf("Camera Spherical Coordinates (%f, %f, %f)\n", alpha, beta, r);
-			break;
-		case 'm': glEnable(GL_MULTISAMPLE); break;
-		case 'n': glDisable(GL_MULTISAMPLE); break;
+	case 'c':
+		printf("Camera Spherical Coordinates (%f, %f, %f)\n", alpha, beta, r);
+		break;
+	case 'm': glEnable(GL_MULTISAMPLE); break;
+	case 'n': glDisable(GL_MULTISAMPLE); break;
+	
+	case 'w': positionMov[2] -= 0.01f;
+	case 's': positionMov[2] += 0.01f;
+	case 'a': positionMov[0] -= 0.01f;
+	case 'd': positionMov[0] += 0.01f;
+	
 	}
 }
 
@@ -259,7 +270,7 @@ void processKeys(unsigned char key, int xx, int yy)
 void processMouseButtons(int button, int state, int xx, int yy)
 {
 	// start tracking the mouse
-	if (state == GLUT_DOWN)  {
+	if (state == GLUT_DOWN) {
 		startX = xx;
 		startY = yy;
 		if (button == GLUT_LEFT_BUTTON)
@@ -292,8 +303,8 @@ void processMouseMotion(int xx, int yy)
 	float alphaAux, betaAux;
 	float rAux;
 
-	deltaX =  - xx + startX;
-	deltaY =    yy - startY;
+	deltaX = -xx + startX;
+	deltaY = yy - startY;
 
 	// left mouse button: move camera
 	if (tracking == 1) {
@@ -320,10 +331,10 @@ void processMouseMotion(int xx, int yy)
 
 	camX = rAux * sin(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
 	camZ = rAux * cos(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
-	camY = rAux *   						       sin(betaAux * 3.14f / 180.0f);
+	camY = rAux * sin(betaAux * 3.14f / 180.0f);
 
-//  uncomment this if not using an idle func
-//	glutPostRedisplay();
+	//  uncomment this if not using an idle func
+	//	glutPostRedisplay();
 }
 
 
@@ -335,11 +346,12 @@ void mouseWheel(int wheel, int direction, int x, int y) {
 
 	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
-	camY = r *   						     sin(beta * 3.14f / 180.0f);
+	camY = r * sin(beta * 3.14f / 180.0f);
 
-//  uncomment this if not using an idle func
-//	glutPostRedisplay();
+	//  uncomment this if not using an idle func
+	//	glutPostRedisplay();
 }
+
 
 // --------------------------------------------------------
 //
@@ -355,7 +367,7 @@ GLuint setupShaders() {
 	shader.loadShader(VSShaderLib::FRAGMENT_SHADER, "shaders/texture_demo.frag");
 
 	// set semantics for the shader variables
-	glBindFragDataLocation(shader.getProgramIndex(), 0,"colorOut");
+	glBindFragDataLocation(shader.getProgramIndex(), 0, "colorOut");
 	glBindAttribLocation(shader.getProgramIndex(), VERTEX_COORD_ATTRIB, "position");
 	glBindAttribLocation(shader.getProgramIndex(), NORMAL_ATTRIB, "normal");
 	glBindAttribLocation(shader.getProgramIndex(), TEXTURE_COORD_ATTRIB, "texCoord");
@@ -370,9 +382,9 @@ GLuint setupShaders() {
 	tex_loc = glGetUniformLocation(shader.getProgramIndex(), "texmap");
 	tex_loc1 = glGetUniformLocation(shader.getProgramIndex(), "texmap1");
 	tex_loc2 = glGetUniformLocation(shader.getProgramIndex(), "texmap2");
-	
+
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
-	
+
 	return(shader.isProgramLinked());
 }
 
@@ -386,51 +398,51 @@ void init()
 	// set the camera position based on its spherical coordinates
 	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
-	camY = r *   						     sin(beta * 3.14f / 180.0f);
+	camY = r * sin(beta * 3.14f / 180.0f);
 
 	//Texture Object definition
-	
+
 	glGenTextures(3, TextureArray);
 	TGA_Texture(TextureArray, (char*)"street2Lanes.tga", 0);
 	TGA_Texture(TextureArray, (char*)"checker.tga", 1);
 	TGA_Texture(TextureArray, (char*)"lightwood.tga", 2);
 
-	float amb[]= {0.1f, 0.15f, 0.1f, 1.0f};
-	float diff[] = {0.1f, 0.50f, 0.1f, 1.0f};
-	float spec[] = {0.1f, 0.1f, 0.1f, 1.0f};
+	float amb[] = { 0.1f, 0.15f, 0.1f, 1.0f };
+	float diff[] = { 0.1f, 0.50f, 0.1f, 1.0f };
+	float spec[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 
-	float amb1[]= {0.0f, 0.0f, 0.0f, 1.0f};
-	float diff1[] = {0.0f, 1.0f, 0.0f, 1.0f};
-	float spec1[] = {0.9f, 0.9f, 0.9f, 1.0f};
+	float amb1[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float diff1[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+	float spec1[] = { 0.9f, 0.9f, 0.9f, 1.0f };
 
 	float amb2[] = { 0.0f, 0.0f, 0.1f, 1.0f };
 	float diff2[] = { 0.0f, 0.0f, 1.0f, 1.0f };
 	float spec2[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-	
+
 	float amb3[] = { 0.0f, 0.0f, 0.1f, 1.0f };
 	float diff3[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 	float spec3[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 
-	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	float shininess= 100.0f;
+	float emissive[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float shininess = 100.0f;
 	int texcount = 0;
 
 	// create geometry and VAO of the pawn
-	objId=0; //estrada
-	memcpy(mesh[objId].mat.ambient, amb1,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff1,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec1,4*sizeof(float));
-	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+	objId = 0; //estrada
+	memcpy(mesh[objId].mat.ambient, amb1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
 
 	// create geometry and VAO of the sphere
-	objId=1;
-	memcpy(mesh[objId].mat.ambient, amb1,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff1,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec1,4*sizeof(float));
-	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+	objId = 1;
+	memcpy(mesh[objId].mat.ambient, amb1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
@@ -461,7 +473,7 @@ void init()
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
-	
+
 	objId = 5; //cabeca frog
 	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
 	memcpy(mesh[objId].mat.diffuse, diff, 4 * sizeof(float));
@@ -479,7 +491,7 @@ void init()
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
-	
+
 
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
@@ -495,22 +507,22 @@ void init()
 //
 
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 
-//  GLUT initialization
+	//  GLUT initialization
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA|GLUT_MULTISAMPLE);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 
-	glutInitContextVersion (3, 3);
-	glutInitContextProfile (GLUT_CORE_PROFILE );
+	glutInitContextVersion(3, 3);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
 
-	glutInitWindowPosition(100,100);
+	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(WinX, WinY);
 	WindowHandle = glutCreateWindow(CAPTION);
 
 
-//  Callback Registration
+	//  Callback Registration
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
 	//glutIdleFunc(renderScene);
@@ -519,22 +531,22 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(processKeys);
 	glutMouseFunc(processMouseButtons);
 	glutMotionFunc(processMouseMotion);
-	glutMouseWheelFunc ( mouseWheel ) ;
-	glutTimerFunc(0,timer,0);
+	glutMouseWheelFunc(mouseWheel);
+	glutTimerFunc(0, timer, 0);
 	glutTimerFunc(0, refresh, 0);
 
 
-//	return from main loop
+	//	return from main loop
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
-//	Init GLEW
+	//	Init GLEW
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	printf ("Vendor: %s\n", glGetString (GL_VENDOR));
-	printf ("Renderer: %s\n", glGetString (GL_RENDERER));
-	printf ("Version: %s\n", glGetString (GL_VERSION));
-	printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+	printf("Vendor: %s\n", glGetString(GL_VENDOR));
+	printf("Renderer: %s\n", glGetString(GL_RENDERER));
+	printf("Version: %s\n", glGetString(GL_VERSION));
+	printf("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	if (!setupShaders())
 		return(1);
@@ -547,4 +559,3 @@ int main(int argc, char **argv) {
 	return(0);
 
 }
-
