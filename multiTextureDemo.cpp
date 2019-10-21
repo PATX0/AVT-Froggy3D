@@ -42,7 +42,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[6];
+struct MyMesh mesh[7];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 
@@ -62,7 +62,7 @@ GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2;
 GLint texMode_uniformId;
 
-GLuint TextureArray[4];
+GLuint TextureArray[3];
 
 	
 // Camera Position
@@ -157,18 +157,14 @@ void renderScene(void) {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[2]);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, TextureArray[3]);
-
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
 		glUniform1i(tex_loc1, 1); 
 		glUniform1i(tex_loc2, 2); 
 		
-	objId=1;
+	objId=0;
 	
-	for (int i = 0 ; i < 3; ++i) {
-		for (int j = 0; j < 4; ++j) {
+	for (int i = 0 ; i < 7; ++i) {
 
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -180,14 +176,33 @@ void renderScene(void) {
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
-			if (objId == 0) {
+			if (i == 0) {
 				translate(MODEL, 2.5f, 0.0f, -25.0f);
-				scale(MODEL, 10.0f, 0.2f, 50.0f);
+				scale(MODEL, 10.0f, 0.1f, 50.0f);
 			}
-			if (objId == 3) {
+			else if (i == 1) {
 				translate(MODEL, -2.5f, 0.0f, -25.0f);
-				scale(MODEL, 5.0f, 0.2f, 50.0f);
-				
+				scale(MODEL, 5.0f, 0.1f, 50.0f);
+			}
+			else if (i == 2) {
+				translate(MODEL, 12.5, 0.0f, -25.0f);
+				scale(MODEL, 15.0f, 0.1f, 50.0f);
+			}
+			else if (i == 3) {
+				translate(MODEL, 27.5, 0.0f, -25.0f);
+				scale(MODEL, 5.0f, 0.1f, 50.0f);
+			}
+			else if (i == 4) {
+					scale(MODEL, 1.5f, 1.1f, 1.0f);
+			}
+
+			else if (i == 5) {
+				translate(MODEL, 0.8f, 0.7f, 0.0f);
+			}
+			
+			else if (i == 6) {
+				translate(MODEL, 5.0f, 0.1f, -4.0f);
+				scale(MODEL, 3.0f, 2.0f, 5.0f);
 			}
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -198,17 +213,16 @@ void renderScene(void) {
 
 			// Render mesh
 
-			if (i==0) glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
-			else if( i==1) glUniform1i(texMode_uniformId, 1); // só componente especular
-			else glUniform1i(texMode_uniformId, 2); // multitexturing
+			if (objId==0) glUniform1i(texMode_uniformId, 2); // modulate Phong color with texel color
+			else if( objId >= 1) glUniform1i(texMode_uniformId, 0); // só componente especular
+			//else glUniform1i(texMode_uniformId, 2); // multitexturing
 
 			glBindVertexArray(mesh[objId].vao);
 			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
 			popMatrix(MODEL);
-			objId = (objId+1)%6; 
-		}
+			objId = (objId+1)%7; 
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);		
@@ -376,93 +390,102 @@ void init()
 
 	//Texture Object definition
 	
-	glGenTextures(4, TextureArray);
-	TGA_Texture(TextureArray, (char*)"stone.tga", 0);
-	TGA_Texture(TextureArray, (char*)"street2LAnes.tga", 1);
+	glGenTextures(3, TextureArray);
+	TGA_Texture(TextureArray, (char*)"street2Lanes.tga", 0);
+	TGA_Texture(TextureArray, (char*)"checker.tga", 1);
 	TGA_Texture(TextureArray, (char*)"lightwood.tga", 2);
-	TGA_Texture(TextureArray, (char*)"forest_pathway.tga", 3);
 
-	float amb[]= {0.2f, 0.15f, 0.1f, 1.0f};
-	float diff[] = {0.8f, 0.6f, 0.4f, 1.0f};
-	float spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
+	float amb[]= {0.1f, 0.15f, 0.1f, 1.0f};
+	float diff[] = {0.1f, 0.50f, 0.1f, 1.0f};
+	float spec[] = {0.1f, 0.1f, 0.1f, 1.0f};
 
-	float amb1[]= {0.3f, 0.0f, 0.0f, 1.0f};
-	float diff1[] = {0.8f, 0.1f, 0.1f, 1.0f};
+	float amb1[]= {0.0f, 0.0f, 0.0f, 1.0f};
+	float diff1[] = {0.0f, 1.0f, 0.0f, 1.0f};
 	float spec1[] = {0.9f, 0.9f, 0.9f, 1.0f};
+
+	float amb2[] = { 0.0f, 0.0f, 0.1f, 1.0f };
+	float diff2[] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	float spec2[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	
+	float amb3[] = { 0.0f, 0.0f, 0.1f, 1.0f };
+	float diff3[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	float spec3[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 100.0f;
 	int texcount = 0;
 
-	lookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
-
 	// create geometry and VAO of the pawn
-	objId=0;
-	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
+	objId=0; //estrada
+	memcpy(mesh[objId].mat.ambient, amb1,4*sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff1,4*sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec1,4*sizeof(float));
 	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
-
 
 	// create geometry and VAO of the sphere
 	objId=1;
-	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
-	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
-	mesh[objId].mat.shininess = shininess;
-	mesh[objId].mat.texCount = texcount;
-	createSphere(1.0f, 20);
-
-	// create geometry and VAO of the cylinder
-	objId=2;
-	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
-	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
-	mesh[objId].mat.shininess = shininess;
-	mesh[objId].mat.texCount = texcount;
-	createCylinder(5.0f,0.5f,20);
-
-	// create geometry and VAO of the cone
-	objId=3;
-	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
+	memcpy(mesh[objId].mat.ambient, amb1,4*sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff1,4*sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec1,4*sizeof(float));
 	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
 
-	// create geometry and VAO of the torus
-	objId=4;
-	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
-	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
-	mesh[objId].mat.shininess = shininess;
-	mesh[objId].mat.texCount = texcount;
-	createTorus(0.5f,1.5f, 20, 20);
-
-	// create geometry and VAO of the cube
-	objId=5;
-	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
-	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+	objId = 2;
+	memcpy(mesh[objId].mat.ambient, amb2, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff2, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec2, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
+
+	objId = 3;
+	memcpy(mesh[objId].mat.ambient, amb1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec1, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createCube();
+
+	objId = 4; //corpo frog
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createCube();
+	
+	objId = 5; //cabeca frog
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createCube();
+
+	objId = 6; //corpo carro
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createCube();
+	
 
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 }
 
