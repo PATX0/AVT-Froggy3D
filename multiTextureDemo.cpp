@@ -42,7 +42,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[7];
+struct MyMesh mesh[11];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 
@@ -81,6 +81,7 @@ char s[32];
 float lightPos[4] = { 4.0f, 6.0f, 2.0f, 1.0f };
 
 float posi[3] = { 0.0f, 0.0f, 0.0f };
+float posi2[3] = { 0.0f, 0.0f, 0.0f };
 float positionMov[3] = { 0.0f, 0.0f, 0.0f };
 float rotationMov[3] = { 0.0f, 0.0f, 0.0f };
 float scaleMov[3] = { 1.0f, 1.0f, 1.0f };
@@ -171,7 +172,7 @@ void renderScene(void) {
 
 	objId = 0;
 
-	for (int i = 0; i < 7; ++i) {
+	for (int i = 0; i < 11; ++i) {
 		
 		// send the material
 		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -210,11 +211,33 @@ void renderScene(void) {
 		}
 		else if (i == 6) {
 			posi[2] += 0.01f; // to translate in the z-axis
-			translate(MODEL, 5.0f, 0.1f, -25.0f);
+			translate(MODEL, 4.0f, 0.1f, -25.0f);
 			scale(MODEL, 3.0f, 2.0f, 5.0f);
 			translate(MODEL, posi[0], posi[1], posi[2]);
-
 		}
+		else if (i == 7 || i == 8 || i == 9 || i == 10) {
+			if (i == 7) {
+				posi2[2] += 0.0125f; // to translate in the z-axis
+				translate(MODEL, 4.0f, 0.5f, -24.0f);
+				translate(MODEL, posi2[0], posi2[1], posi2[2]);
+			}
+			if (i == 8) {
+				posi2[2] += 0.0125f; // to translate in the z-axis
+				translate(MODEL, 7.0f, 0.5f, -24.0f);
+				translate(MODEL, posi2[0], posi2[1], posi2[2]);
+			}
+			if (i == 9) {
+				posi2[2] += 0.0125f; // to translate in the z-axis
+				translate(MODEL, 4.0f, 0.5f, -21.0f);
+				translate(MODEL, posi2[0], posi2[1], posi2[2]);
+			}
+			if (i == 10) {
+				posi2[2] += 0.0125f; // to translate in the z-axis
+				translate(MODEL, 7.0f, 0.5f, -21.0f);
+				translate(MODEL, posi2[0], posi2[1], posi2[2]);
+			}
+		}
+
 		// send matrices to OGL
 		computeDerivedMatrix(PROJ_VIEW_MODEL);
 		glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -233,7 +256,7 @@ void renderScene(void) {
 		glBindVertexArray(0);
 
 		popMatrix(MODEL);
-		objId = (objId + 1) % 7;
+		objId = (objId + 1) % 11;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -497,6 +520,42 @@ void init()
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
 	createCube();
+
+	objId = 7; //roda carro
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createSphere(0.5f, 5);
+
+	objId = 8; //roda carro
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createSphere(0.5f, 5);
+
+	objId = 9; //roda carro
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createSphere(0.5f, 5);
+
+	objId = 10; //corpo carro
+	memcpy(mesh[objId].mat.ambient, amb, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec3, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createSphere(0.5f, 5);
 
 
 	// some GL settings
