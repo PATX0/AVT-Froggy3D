@@ -42,7 +42,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[11];
+struct MyMesh mesh[12];
 int objId = 0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 
@@ -90,6 +90,7 @@ float lightPos[4] = { 4.0f, 6.0f, 2.0f, 1.0f };
 
 float posi[3] = { 0.0f, 0.0f, 0.0f };
 float posi2[3] = { 0.0f, 0.0f, 0.0f };
+float posi3[3] = { 0.0f, 0.0f, 0.0f };
 float positionMov[3] = { 0.0f, 0.0f, 0.0f };
 float rotationMov[3] = { 0.0f, 0.0f, 0.0f };
 float scaleMov[3] = { 1.0f, 1.0f, 1.0f };
@@ -194,7 +195,7 @@ void renderScene(void) {
 
 	objId = 0;
 
-	for (int i = 0; i < 11; ++i) {
+	for (int i = 0; i < 12; ++i) {
 
 		// send the material
 		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -259,7 +260,18 @@ void renderScene(void) {
 				translate(MODEL, posi2[0], posi2[1], posi2[2]);
 			}
 		}
+		else if (i == 11) {
+			posi3[2] += 0.05;
+			translate(MODEL, 25.0f, 0.1f, -20.0f);
+			translate(MODEL, posi3[0], posi3[1], posi3[2]);
+			rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			rotate(MODEL, 360.0, 1.0f, 0.0f, 0.0f);
+			
+			
+			
+			//translate(MODEL, posi3[0], posi3[1], posi3[2]);
 
+		}
 		// send matrices to OGL
 		computeDerivedMatrix(PROJ_VIEW_MODEL);
 		glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -278,7 +290,7 @@ void renderScene(void) {
 		glBindVertexArray(0);
 
 		popMatrix(MODEL);
-		objId = (objId + 1) % 11;
+		objId = (objId + 1) % 12;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -483,6 +495,10 @@ void init()
 	float diff3[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 	float spec3[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 
+	float amb4[] = { 0.2f, 0.15f, 0.1f, 1.0f };
+	float diff4[] = { 0.8f, 0.6f, 0.4f, 1.0f };
+	float spec4[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+
 	float emissive[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	float shininess = 100.0f;
 	int texcount = 0;
@@ -588,6 +604,14 @@ void init()
 	mesh[objId].mat.texCount = texcount;
 	createSphere(0.5f, 5);
 
+	objId = 11; //tronco 1  
+	memcpy(mesh[objId].mat.ambient, amb4, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.diffuse, diff4, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.specular, spec4, 4 * sizeof(float));
+	memcpy(mesh[objId].mat.emissive, emissive, 4 * sizeof(float));
+	mesh[objId].mat.shininess = shininess;
+	mesh[objId].mat.texCount = texcount;
+	createCylinder(10.0f, 0.5f, 20);
 
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
