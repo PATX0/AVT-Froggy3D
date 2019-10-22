@@ -76,10 +76,11 @@ float alpha = 39.0f, beta = 51.0f;
 float r = 10.0f;
 
 // Frame counting and FPS computation
-long myTime,timebase = 0,frame = 0;
+long myTime, timebase = 0, frame = 0;
 char s[32];
-float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+float lightPos[4] = { 4.0f, 6.0f, 2.0f, 1.0f };
 
+float posi[3] = { 0.0f, 0.0f, 0.0f };
 float positionMov[3] = { 0.0f, 0.0f, 0.0f };
 float rotationMov[3] = { 0.0f, 0.0f, 0.0f };
 float scaleMov[3] = { 1.0f, 1.0f, 1.0f };
@@ -95,6 +96,9 @@ void timer(int value)
 	glutTimerFunc(1000, timer, 0);
 }
 
+int getTime() {
+	return glutGet(GLUT_ELAPSED_TIME);
+}
 void refresh(int value)
 {
 	glutPostRedisplay();
@@ -168,7 +172,7 @@ void renderScene(void) {
 	objId = 0;
 
 	for (int i = 0; i < 7; ++i) {
-
+		
 		// send the material
 		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
 		glUniform4fv(loc, 1, mesh[objId].mat.ambient);
@@ -204,10 +208,12 @@ void renderScene(void) {
 			translate(MODEL, 0.8f, 0.7f, 0.0f);
 			translate(MODEL, positionMov[0]*1.5, positionMov[1], positionMov[2]);
 		}
-
 		else if (i == 6) {
-			translate(MODEL, 5.0f, 0.1f, -4.0f);
+			posi[2] += 0.01f; // to translate in the z-axis
+			translate(MODEL, 5.0f, 0.1f, -25.0f);
 			scale(MODEL, 3.0f, 2.0f, 5.0f);
+			translate(MODEL, posi[0], posi[1], posi[2]);
+
 		}
 		// send matrices to OGL
 		computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -253,10 +259,10 @@ void processKeys(unsigned char key, int xx, int yy)
 	case 'm': glEnable(GL_MULTISAMPLE); break;
 	case 'n': glDisable(GL_MULTISAMPLE); break;
 	
-	case 'w': positionMov[2] -= 0.01f;
-	case 's': positionMov[2] += 0.01f;
-	case 'a': positionMov[0] -= 0.01f;
-	case 'd': positionMov[0] += 0.01f;
+	case 'w': positionMov[2] -= 0.05f; break;
+	case 's': positionMov[2] += 0.05f; break;
+	case 'a': positionMov[0] -= 0.05f; break;
+	case 'd': positionMov[0] += 0.05f; break;
 	
 	}
 }
