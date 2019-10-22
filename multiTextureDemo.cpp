@@ -259,10 +259,10 @@ void processKeys(unsigned char key, int xx, int yy)
 	case 'm': glEnable(GL_MULTISAMPLE); break;
 	case 'n': glDisable(GL_MULTISAMPLE); break;
 	
-	case 'w': positionMov[2] -= 0.05f; break;
-	case 's': positionMov[2] += 0.05f; break;
-	case 'a': positionMov[0] -= 0.05f; break;
-	case 'd': positionMov[0] += 0.05f; break;
+	case 'w': positionMov[0] += 0.05f; break;
+	case 's': positionMov[0] -= 0.05f; break;
+	case 'a': positionMov[2] -= 0.05f; break;
+	case 'd': positionMov[2] += 0.05f; break;
 	
 	}
 }
