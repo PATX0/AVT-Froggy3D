@@ -43,7 +43,7 @@ unsigned int FrameCount = 0;
 VSShaderLib shader;
 
 struct MyMesh mesh[11];
-int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
+int objId = 0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 
 //External array storage defined in AVTmathLib.cpp
@@ -64,16 +64,24 @@ GLint texMode_uniformId;
 
 GLuint TextureArray[3];
 
-	
-// Camera Position
+char camMode = 'O'; //keep track of what camera is being used
+
+//Orthogonal Camera Position
 float camX, camY, camZ;
+
+//Perspective Fixed Camera Position
+float cX, cY, cZ;
+
+// Camera Spherical Coordinates for Orthogonal view
+float alpha = -90.0f, beta = 90.0f;
+float r = 30.0f;
+
+// Camera Spherical Coordinates for Perspective view
+float alphaP = -90.0f, betaP = 55.0f;
+float rP = 30.0f;
 
 // Mouse Tracking Variables
 int startX, startY, tracking = 0;
-
-// Camera Spherical Coordinates
-float alpha = 39.0f, beta = 51.0f;
-float r = 10.0f;
 
 // Frame counting and FPS computation
 long myTime, timebase = 0, frame = 0;
@@ -121,8 +129,17 @@ void changeSize(int w, int h) {
 	glViewport(0, 0, w, h);
 	// set the projection matrix
 	ratio = (1.0f * w) / h;
+
 	loadIdentity(PROJECTION);
-	perspective(53.13f, ratio, 0.1f, 1000.0f);
+
+	if (camMode == 'O') {
+		ortho(-25.00f, 25.00f, -10.0f, 40.0f, 0.1f, 1000.0f);
+	}
+	if (camMode == 'P'){
+		perspective(65.00f, ratio, 0.1f, 1000.0f);
+	}
+
+
 }
 
 
@@ -141,7 +158,12 @@ void renderScene(void) {
 	loadIdentity(VIEW);
 	loadIdentity(MODEL);
 	// set the camera using a function similar to gluLookAt
-	lookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
+	if (camMode == 'O') {
+		lookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
+	}
+	if (camMode == 'P') {
+		lookAt(cX, cY, cZ, 0, 0, 0, 0, 1, 0);
+	}
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
 
@@ -173,7 +195,7 @@ void renderScene(void) {
 	objId = 0;
 
 	for (int i = 0; i < 11; ++i) {
-		
+
 		// send the material
 		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
 		glUniform4fv(loc, 1, mesh[objId].mat.ambient);
@@ -207,7 +229,7 @@ void renderScene(void) {
 
 		else if (i == 5) {
 			translate(MODEL, 0.8f, 0.7f, 0.0f);
-			translate(MODEL, positionMov[0]*1.5, positionMov[1], positionMov[2]);
+			translate(MODEL, positionMov[0] * 1.5, positionMov[1], positionMov[2]);
 		}
 		else if (i == 6) {
 			posi[2] += 0.01f; // to translate in the z-axis
@@ -281,19 +303,24 @@ void processKeys(unsigned char key, int xx, int yy)
 		break;
 	case 'm': glEnable(GL_MULTISAMPLE); break;
 	case 'n': glDisable(GL_MULTISAMPLE); break;
-	
-	case 'w': positionMov[0] += 0.05f; break;
-	case 's': positionMov[0] -= 0.05f; break;
-	case 'a': positionMov[2] -= 0.05f; break;
-	case 'd': positionMov[2] += 0.05f; break;
-	
+
+	//frog position
+	case 'w': positionMov[0] += 0.1f; break;
+	case 's': positionMov[0] -= 0.1f; break;
+	case 'a': positionMov[2] -= 0.1f; break;
+	case 'd': positionMov[2] += 0.1f; break;
+	//cameras
+	case '1': camMode = 'O'; break;
+	case '2': camMode = 'P'; break;
+	//case '3': camMode = 'M'; break;
+
 	}
 }
 
 
 // ------------------------------------------------------------
 //
-// Mouse Events
+// Mouse Events for the MOVING Camera
 //
 
 void processMouseButtons(int button, int state, int xx, int yy)
@@ -429,6 +456,10 @@ void init()
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camY = r * sin(beta * 3.14f / 180.0f);
 
+	//Perspective Camera spherical coordinates
+	cX = rP * sin(alphaP * 3.14f / 180.0f) * cos(betaP * 3.14f / 180.0f);
+	cZ = rP * cos(alphaP * 3.14f / 180.0f) * cos(betaP * 3.14f / 180.0f);
+	cY = rP * sin(betaP * 3.14f / 180.0f);
 	//Texture Object definition
 
 	glGenTextures(3, TextureArray);
