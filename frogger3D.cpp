@@ -63,22 +63,36 @@ GLint tex_loc, tex_loc1, tex_loc2;
 GLint texMode_uniformId;
 
 GLuint TextureArray[3];
-
 char camMode = 'O'; //keep track of what camera is being used
 
 //Orthogonal Camera Position
-float camX, camY, camZ;
+float coX, coY, coZ;
 
-//Perspective Fixed Camera Position
+//Fixed Perspective Camera Position
 float cX, cY, cZ;
 
+//Moving Perspective Camera Position
+float camX, camY, camZ;
+
+
 // Camera Spherical Coordinates for Orthogonal view
-float alpha = -90.0f, beta = 90.0f;
-float r = 30.0f;
+float alphaO = -90.0f, betaO = 90.0f;
+float rO = 30.0f;
 
 // Camera Spherical Coordinates for Perspective view
 float alphaP = -90.0f, betaP = 55.0f;
 float rP = 30.0f;
+
+// Camera Spherical Coordinates for MOVING Perspective view
+float alpha = -90.0f, beta = 45.0f;
+float r = 10.0f;
+// angle of rotation for the camera direction
+float angle = 0.0;
+// actual vector representing the camera's direction
+float lx = 0.0f, lz = -1.0f;
+// values to move
+float deltaAngle = 0.0f;
+float deltaMove = 0;
 
 // Mouse Tracking Variables
 int startX, startY, tracking = 0;
@@ -136,11 +150,12 @@ void changeSize(int w, int h) {
 	if (camMode == 'O') {
 		ortho(-25.00f, 25.00f, -10.0f, 40.0f, 0.1f, 1000.0f);
 	}
-	if (camMode == 'P'){
+	if (camMode == 'P') {
 		perspective(65.00f, ratio, 0.1f, 1000.0f);
 	}
-
-
+	if (camMode == 'M') {
+		perspective(53.13f, ratio, 0.1f, 1000.0f);
+	}
 }
 
 
@@ -151,7 +166,9 @@ void changeSize(int w, int h) {
 
 void renderScene(void) {
 
-	GLint loc;
+	GLint loc;	
+	//if (deltaMove) { computePos(deltaMove); }
+	//if (deltaAngle) { computeDir(deltaAngle); }
 
 	FrameCount++;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -160,10 +177,13 @@ void renderScene(void) {
 	loadIdentity(MODEL);
 	// set the camera using a function similar to gluLookAt
 	if (camMode == 'O') {
-		lookAt(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
+		lookAt(coX, coY, coZ, 0, 0, 0, 0, 1, 0);
 	}
 	if (camMode == 'P') {
 		lookAt(cX, cY, cZ, 0, 0, 0, 0, 1, 0);
+	}
+	if (camMode == 'M') {
+		lookAt(camX, camY, camZ, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	}
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
@@ -266,9 +286,9 @@ void renderScene(void) {
 			translate(MODEL, posi3[0], posi3[1], posi3[2]);
 			rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			rotate(MODEL, 360.0, 1.0f, 0.0f, 0.0f);
-			
-			
-			
+
+
+
 			//translate(MODEL, posi3[0], posi3[1], posi3[2]);
 
 		}
@@ -316,15 +336,15 @@ void processKeys(unsigned char key, int xx, int yy)
 	case 'm': glEnable(GL_MULTISAMPLE); break;
 	case 'n': glDisable(GL_MULTISAMPLE); break;
 
-	//frog position
+		//frog position
 	case 'w': positionMov[0] += 0.1f; break;
 	case 's': positionMov[0] -= 0.1f; break;
 	case 'a': positionMov[2] -= 0.1f; break;
 	case 'd': positionMov[2] += 0.1f; break;
-	//cameras
+		//cameras
 	case '1': camMode = 'O'; break;
 	case '2': camMode = 'P'; break;
-	//case '3': camMode = 'M'; break;
+	case '3': camMode = 'M'; break;
 
 	}
 }
@@ -463,15 +483,21 @@ GLuint setupShaders() {
 
 void init()
 {
-	// set the camera position based on its spherical coordinates
+	//Orthogonal Camera spherical coordinates
+	coX = rO * sin(alphaO * 3.14f / 180.0f) * cos(betaO * 3.14f / 180.0f);
+	coZ = rO * cos(alphaO * 3.14f / 180.0f) * cos(betaO * 3.14f / 180.0f);
+	coY = rO * sin(betaO * 3.14f / 180.0f);
+
+	//Fixed Perspective Camera spherical coordinates
+	cX = rP * sin(alphaP * 3.14f / 180.0f) * cos(betaP * 3.14f / 180.0f);
+	cZ = rP * cos(alphaP * 3.14f / 180.0f) * cos(betaP * 3.14f / 180.0f);
+	cY = rP * sin(betaP * 3.14f / 180.0f);
+
+	//Moving Perspective Camera spherical coordinates
 	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camY = r * sin(beta * 3.14f / 180.0f);
 
-	//Perspective Camera spherical coordinates
-	cX = rP * sin(alphaP * 3.14f / 180.0f) * cos(betaP * 3.14f / 180.0f);
-	cZ = rP * cos(alphaP * 3.14f / 180.0f) * cos(betaP * 3.14f / 180.0f);
-	cY = rP * sin(betaP * 3.14f / 180.0f);
 	//Texture Object definition
 
 	glGenTextures(3, TextureArray);
