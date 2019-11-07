@@ -2,14 +2,14 @@
 
 2nd DELIVERY ON 20/11
 
-- [] Transparent objects
-- [] Stencil test
-- [] Fog effect
-- [] Reflection effect on water
-- [] Shadows on car (?)
-- [] Lens Flare 2D
-- [] Billboarding, elements always facing the camera (life / time bar)
-- [] Particles system, fireworks when reach the end.
+- [ ] Transparent objects
+- [ ] Stencil test
+- [ ] Fog effect
+- [ ] Reflection effect on water
+- [ ] Shadows on car (?)
+- [ ] Lens Flare 2D
+- [ ] Billboarding, elements always facing the camera (life / time bar)
+- [ ] Particles system, fireworks when reach the end.
 
 
 ---------------------------------------------------------------------------
