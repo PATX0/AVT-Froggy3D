@@ -1,23 +1,37 @@
 # AVT-Froggy3D
 
-DELIVERY ON 23/10
+2nd DELIVERY ON 20/11
+
+- [] Transparent objects
+- [] Stencil test
+- [] Fog effect
+- [] Reflection effect on water
+- [] Shadows on car (?)
+- [] Lens Flare 2D
+- [] Billboarding, elements always facing the camera (life / time bar)
+- [] Particles system, fireworks when reach the end.
+
+
+---------------------------------------------------------------------------
+
+1st DELIVERY ON 23/10
 
 ## Objects
-- [ ] River and the roads (using cubes)
-- [ ] Frog min. 2 objects
+- [X] River and the roads (using cubes)
+- [X] Frog min. 2 objects
 - [ ] Cars min. 4 objects ( 4 wheels 1 cube)
 - [ ] Wood trunks
 - [ ] Turtles (maybe just a cone)
 - [ ] 6 Candles
 
 ## Cameras
-- [ ] '1' -> fixed top view camera, orthogonal projection (2D view) 
-- [ ] '2' -> fixed top view, perspective projection
+- [X] '1' -> fixed top view camera, orthogonal projection (2D view) 
+- [X] '2' -> fixed top view, perspective projection
 - [ ] '3' -> moving perspective view from behind the frog that follows  him
-- [ ] orient moving cam with mouse movement and pressing left key
+- [X] orient moving cam with mouse movement and pressing left key
 
 ## Movements
-- [ ] FROG
+- [X] FROG
 
 'P' -> move right
 
@@ -27,8 +41,8 @@ DELIVERY ON 23/10
 
 'A' -> move backward 
 
-- [ ] CARS, TURTLES: uniform & rectilinear	
-- [ ] TRUNKS: uniform, rectilinear with rotation 
+- [X] CARS, TURTLES: uniform & rectilinear	
+- [X] TRUNKS: uniform, rectilinear with rotation 
 
 ## Light,  Materials and Textures
 
@@ -36,7 +50,7 @@ DELIVERY ON 23/10
 - [ ] Appropriate materials for the different objects
 
 ### Lights
-- [ ] Global illumination  : directional light source 
+- [X] Global illumination  : directional light source 
 
 'N' -> ON/OFF (DAY/NIGHT)
 
